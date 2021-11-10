@@ -11,8 +11,6 @@ public class Order {
 	
 	private HashSet<Item> items = new HashSet<>();
 	
-	private CreditCard creditCard;
-	
 	public Order( ) { }
 
 	public LocalDateTime getDataOrder() {
@@ -39,18 +37,9 @@ public class Order {
 		this.totalPrice = totalPrice;
 	}
 
-	public CreditCard getCreditCard() {
-		return creditCard;
-	}
-
-	public void setCreditCard(CreditCard creditCard) {
-		this.creditCard = creditCard;
-	}
-
 	@Override
 	public String toString() {
-		return "Order [dataOrder=" + dataOrder + ", items=" + items + ", totalPrice=" + totalPrice + ", creditCard="
-				+ creditCard + "]";
+		return "Order [dataOrder=" + dataOrder + ", totalPrice=" + totalPrice + ", items=" + items + "]";
 	}
 
 }

@@ -188,7 +188,7 @@ public class OrderController {
 			
 			try {
 				
-				file.writeCheckoutFile( outputMessage );
+				file.writeOutput( outputMessage, false );
 				
 			} catch (IOException e) {
 				
@@ -200,7 +200,7 @@ public class OrderController {
 			
 			try {
 				
-				file.writeMessage( outputMessage );
+				file.writeOutput( outputMessage, true );
 				
 			} catch (IOException e) {
 				

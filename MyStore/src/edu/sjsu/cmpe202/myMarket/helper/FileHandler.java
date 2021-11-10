@@ -1,7 +1,7 @@
 package edu.sjsu.cmpe202.myMarket.helper;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +11,8 @@ import java.util.ArrayList;
 public class FileHandler {
 
 	Path path;
+	
+	OutputFile outputFile;
 	
 	private ArrayList<String> fileContent = new ArrayList<>();
 
@@ -48,27 +50,21 @@ public class FileHandler {
 		
 	}
 	
-	public void writeCheckoutFile( ArrayList<String> message ) throws IOException {
+	public void writeOutput( ArrayList<String> message, boolean isError ) throws IOException {
 		
-		FileWriter errorFile = new FileWriter( path.getParent().toString() + "/output.csv");
+		if( isError ) {
+			
+			outputFile = new ErrorFile( );
+			
+		} else {
+			
+			outputFile = new CheckoutFile( );
+			
+		}
 		
-		for( String line : message )
+		outputFile.writeToFile(message); 
 		
-			errorFile.write( line + "\n" );
-		
-		errorFile.close();
-		
-	}
-	
-	public void writeMessage( ArrayList<String> message ) throws IOException {
-		
-		FileWriter errorFile = new FileWriter( path.getParent().toString() + "/errorLog.txt");
-		
-		for( String line : message )
-		
-			errorFile.write( line + "\n" );
-		
-		errorFile.close();
+		outputFile.save(path);
 		
 	}
 	

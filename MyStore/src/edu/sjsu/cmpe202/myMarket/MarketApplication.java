@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 
 import edu.sjsu.cmpe202.myMarket.controller.OrderController;
 import edu.sjsu.cmpe202.myMarket.controller.StockController;
-import edu.sjsu.cmpe202.myMarket.database.InMemoryDB;
 
 public class MarketApplication {
 
@@ -83,8 +82,6 @@ public class MarketApplication {
 					orderController.checkoutOrder();
 					
 					System.out.println( "The order was created with a total of $" + orderController.getTotalPrice() );
-					
-					
 				
 				}
 				
