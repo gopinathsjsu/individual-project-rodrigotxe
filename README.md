@@ -2,7 +2,7 @@
 
 ## How to run the system
 
-1 - The Stock input file ( Items dataset ) needd to be entered as the first Argument to the main class.
+1 - The Stock input file ( Items dataset ) needs to be entered as the first Argument to the main class.
   - If the system cannot find the file, an error will be generated on the console.
 
 2 - The user will be prompted to enter the file path ( full path ) for the order entry on the command line.
