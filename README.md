@@ -20,6 +20,6 @@ All output files will be created in the same input files folder.
 
 ## Class Diagram
 
-
+![Class Diagra - MyMarket](https://user-images.githubusercontent.com/62269628/141204024-3e5752fb-5e06-454d-b9f2-d48f429e7b23.png)
 
 
