@@ -15,8 +15,8 @@
 5 - To create a new order, the user needs to inform a new file. Otherwise, just leave the path input blank and press enter.
 
 * All output files will be created in the same input files folder.
-  - Error Log = errorLog_<timestap>.txt
-  - Output = output_<timestap>.csv
+  - Error Log = errorLog_timestamp.txt
+  - Output = output_timestamp.csv
 
 ## Class Diagram
 
