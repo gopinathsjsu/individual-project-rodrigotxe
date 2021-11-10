@@ -20,24 +20,26 @@ public class FileHandler {
 
 	}
 
-	public void readFile() throws IOException {
+	public void readFile( boolean ignoreFirstLine  ) throws IOException {
 		
-		 if ( Files.notExists( path ) ) {
+		if ( Files.notExists( path ) ) {
              
-			 return;
+			new IOException();
 			 
-         }
-
+        }
+		 
 		BufferedReader bufferedReader = new BufferedReader( new FileReader( path.toFile() ) );
 
 		String line = "";
 
 		while ( ( line = bufferedReader.readLine() ) != null ) {
+			
+			if( ignoreFirstLine ) { ignoreFirstLine = false; continue; }
 
 			fileContent.add( line );
 
 		}
-
+		
 	}
 	
 	public ArrayList<String> getFileContent() {
@@ -48,7 +50,7 @@ public class FileHandler {
 	
 	public void writeCheckoutFile( ArrayList<String> message ) throws IOException {
 		
-		FileWriter errorFile = new FileWriter( path.getParent().toString() + "/checkout.csv");
+		FileWriter errorFile = new FileWriter( path.getParent().toString() + "/output.csv");
 		
 		for( String line : message )
 		

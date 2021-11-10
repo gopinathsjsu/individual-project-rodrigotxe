@@ -1,39 +1,105 @@
 package edu.sjsu.cmpe202.myMarket;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import edu.sjsu.cmpe202.myMarket.controller.OrderController;
+import edu.sjsu.cmpe202.myMarket.controller.StockController;
+import edu.sjsu.cmpe202.myMarket.database.InMemoryDB;
 
 public class MarketApplication {
 
 	public static void main(String[] args) throws Exception {
 		
+		MarketApplication market = new MarketApplication();
+		
+		market.startMarket(args);
+		
+	}
+	
+	private void startMarket( String[] args ) {
+		
 		if( args.length == 0 ) {
 			
-			System.out.println( "I need a file to process" );
+			System.out.println( "Please enter stock file to start" );
+			
+			System.exit(0);
 			
 		} 
 		
-		OrderController orderController = new OrderController( args[0] );
+		StockController stockController = new StockController( args[0] );
 		
-		orderController.startOrder();
+		stockController.createStock();
 		
-		if( orderController.checkOrder() ) {
+		while( true ) {
 			
-			orderController.calculateTotalPrice();
+			String path = handleMainMenu( );
 			
-			if( orderController.getTotalPrice() > 0 ) {
+			if( path.equals("") ) break;
+			
+			startNewOrder( path );
+			
+		}
+		
+		System.out.println( "Thank you for using MyMarket - Automated Purchasing System." );
+		
+	}
+	
+	private String handleMainMenu( ) {
+		
+		BufferedReader reader = new BufferedReader( new InputStreamReader( System.in ) );
+		
+		System.out.println( "Enter the order file path to initiate a new order or leave it blank if you have no more orders: " );
+		
+		String response = "";
+		
+		try {
+			
+			response = reader.readLine();
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
+		}
+		
+		return response;
+		
+	}
+	
+	private void startNewOrder( String path ) {
+		
+		OrderController orderController = new OrderController( path );
+		
+		if( orderController.startOrder() ) {
+			
+			if( orderController.checkOrder() ) {
 				
-				orderController.enterCreditCardNumber( );
+				orderController.calculateTotalPrice();
 				
-				orderController.checkoutOrder();
-			
+				if( orderController.getTotalPrice() > 0 ) {
+					
+					orderController.checkoutOrder();
+					
+					System.out.println( "The order was created with a total of $" + orderController.getTotalPrice() );
+					
+					
+				
+				}
+				
+			} else {
+				
+				System.out.println( "An error has occurred. Please check the generated file." );
+				
+				orderController.generateOutputFile( );
+
 			}
-			
-			System.out.println( "Success!" );
 			
 		} else {
 			
-			orderController.printMessage();
-
+			System.out.println( "The order file was not found, Please check the file path." );
+			
 		}
 		
 	}

@@ -2,22 +2,22 @@ package edu.sjsu.cmpe202.myMarket.model;
 
 public class Item {
 	
+	private String category;
+	
 	private String name;
 	
 	private double price;
 	
 	private int quantityStock;
 	
-	private Category categoty;
-
 	public Item( ) { }
 	
-	public Item(String name, double price, int quantityStock, Category categoty) {
-	
+	public Item(String category, String name, double price, int quantityStock) {
+		
+		this.category = category;
 		this.name = name;
 		this.price = price;
 		this.quantityStock = quantityStock;
-		this.categoty = categoty;
 		
 	}
 	
@@ -26,6 +26,14 @@ public class Item {
 		this.name = name;
 		this.quantityStock = quantity;
 		
+	}
+	
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public String getName() {
@@ -52,18 +60,10 @@ public class Item {
 		this.quantityStock = quantityStock;
 	}
 
-	public Category getCategoty() {
-		return categoty;
-	}
-
-	public void setCategoty(Category categoty) {
-		this.categoty = categoty;
-	}
-
 	@Override
 	public String toString() {
-		return "Item [name=" + name + ", price=" + price + ", quantityStock=" + quantityStock + ", categoty=" + categoty
+		return "Item [category=" + category + ", name=" + name + ", price=" + price + ", quantityStock=" + quantityStock
 				+ "]";
 	}
-	
+
 }

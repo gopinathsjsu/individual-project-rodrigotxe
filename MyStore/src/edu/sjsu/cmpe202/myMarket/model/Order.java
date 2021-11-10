@@ -7,9 +7,9 @@ public class Order {
 	
 	private LocalDateTime dataOrder = LocalDateTime.now();
 	
-	private HashSet<Item> items = new HashSet<>();
-	
 	private double totalPrice;
+	
+	private HashSet<Item> items = new HashSet<>();
 	
 	private CreditCard creditCard;
 	

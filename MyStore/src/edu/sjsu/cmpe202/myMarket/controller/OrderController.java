@@ -2,16 +2,13 @@ package edu.sjsu.cmpe202.myMarket.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import edu.sjsu.cmpe202.myMarket.database.InMemoryDB;
 import edu.sjsu.cmpe202.myMarket.helper.FileHandler;
-import edu.sjsu.cmpe202.myMarket.model.Category;
-import edu.sjsu.cmpe202.myMarket.model.CreditCard;
 import edu.sjsu.cmpe202.myMarket.model.Item;
 import edu.sjsu.cmpe202.myMarket.model.Order;
+import edu.sjsu.cmpe202.myMarket.model.OrderItem;
 
 public class OrderController {
 	
@@ -19,59 +16,55 @@ public class OrderController {
 	
 	private Order currentOrder = new Order();
 	
-	private FileHandler orderFile;
-	
-	private HashMap<String, Integer> categoryLimit = new HashMap<>();
-	
-	private HashMap<String, Integer> categoryTotal = new HashMap<>();
+	private FileHandler file;
 	
 	private ArrayList<String> outputMessage = new ArrayList<>();
 	
-	private HashSet<Item> items = new HashSet<>();
+	private ArrayList<OrderItem> items = new ArrayList<>();
 	
-	private String creditCardNumber;
+	private HashSet<String> creditCards = new HashSet<String>();
 	
 	private double totalPrice = 0;
 	
 	public OrderController ( String filePath ) {
 		
-		orderFile = new FileHandler( filePath );
+		file = new FileHandler( filePath );
 		
 	}
 	
-	public void startOrder( ) {
+	public boolean startOrder( ) {
 		
 		try {
 			
-			orderFile.readFile();
+			file.readFile( true );
 			
 		} catch (Exception e) {
 			
-			e.printStackTrace();
+			return false;
 			
 		}
 		
-		getItems( orderFile.getFileContent(  ) );
+		getItems( file.getFileContent(  ) );
+		
+		return true;
 		
 	}
 	
 	public boolean checkOrder( ) {
 		
 		checkItemStock();
-		checkItemCategory();
-		
+	
 		return outputMessage.isEmpty();
 		
 	}
 	
 	public void calculateTotalPrice( ) {
 		
-		items.forEach( (item) -> {
+		items.forEach( ( item ) -> {
 			
-			totalPrice += item.getQuantityStock() * item.getPrice();
+			totalPrice += item.getQuantity() * item.getPrice();
 			
 		});
-		
 		
 		currentOrder.setTotalPrice(totalPrice);
 		
@@ -83,21 +76,27 @@ public class OrderController {
 	
 	}
 	
-	public void enterCreditCardNumber() {
-		
-		CreditCard creditCard= new CreditCard(creditCardNumber);
-		
-		currentOrder.setCreditCard( creditCard );
-		
-		if( ! db.getCreditCards().contains( creditCard ) )
-		
-			db.getCreditCards().add( creditCard );
-		
-	}
-	
 	public void checkoutOrder(  ) {
 		
 		db.getOrders().add( currentOrder );
+		
+		for( OrderItem currentItem : items ) {
+			
+			Item item = db.getItems().get( currentItem.getName() );
+			
+			item.setQuantityStock( item.getQuantityStock() - currentItem.getQuantity() );
+			
+ 		}
+		
+		for( String creditCard : creditCards ) {
+			
+			if( !db.getCreditCards().contains( creditCard ) ) {
+				
+				db.getCreditCards().add(creditCard);
+				
+			}
+			
+		}
 		
 		generateOutputFile( );
 		
@@ -117,25 +116,25 @@ public class OrderController {
 		
 		for( String line : fileContent ) {
 			
-			String[] item = line.split(",", 2);
+			String[] item = line.split(",");
+			
+			if ( db.getItems().containsKey(item[0]) ) {
 
-			if ( item.length == 2 ) {
-
-				if ( db.getItems().containsKey(item[0]) ) {
-
-					item[1] = item[1].replaceAll("\\s+", "");
-
-					items.add( new Item( item[0], Integer.parseInt( item[1] ) ) );
-
-				}
+				items.add( new OrderItem( item[0], Integer.parseInt( item[1] ), item[2].replaceAll("\\s+", "") ) );
 
 			} else {
-
-				creditCardNumber = line;
-
+				
+				outputMessage.add("Item " + item[0] + " not found");
+			
 			}
 
-		}  
+		}
+		
+		if( !outputMessage.isEmpty() ) {
+			
+			items.clear();
+			
+		}
 		
 	}
 	
@@ -143,13 +142,11 @@ public class OrderController {
 		
 		StringBuilder message = new StringBuilder();
 		
-		for( Item currentItem : items ) {
+		for( OrderItem currentItem : items ) {
 			
 			Item item = db.getItems().get( currentItem.getName() );
 			
-			sumItemQuantityByCategory( item.getCategoty(), currentItem.getQuantityStock() );
-			
-			if ( item.getQuantityStock() < currentItem.getQuantityStock() ) {
+			if ( item.getQuantityStock() < currentItem.getQuantity() ) {
 				
 				if ( message.length() > 0 )
 
@@ -160,6 +157,10 @@ public class OrderController {
 			} else {
 				
 				currentItem.setPrice( item.getPrice() );
+				
+				if( !creditCards.contains( currentItem.getCreditCard() ) )
+				
+					creditCards.add( currentItem.getCreditCard() );
 				
 			}
 			
@@ -177,73 +178,17 @@ public class OrderController {
 		
 	}
 	
-	private boolean checkItemCategory(  ) {
-		
-		StringBuilder message = new StringBuilder();
-		
-		for( Map.Entry<String, Integer> entry : categoryLimit.entrySet() ) {
-			   
-			if( categoryTotal.get( entry.getKey() ) > entry.getValue() ) {
-				
-				if ( message.length() > 0 )
-
-					message.append( ", ");
-					
-				message.append( entry.getKey() + "(" + entry.getValue() + ")" );
-				
-			}
-			
-		}
-		
-		if ( message.length() > 0 ) { 
-			
-			outputMessage.add("Please check the quantity limit of each Category.");
-			
-			outputMessage.add( message.toString() );
-			
-		}
-		
-		return message.length() == 0;
-		
-	}
-	
-	private void sumItemQuantityByCategory( Category category, int quantity ) {
-		
-		int newQuantity = categoryTotal.getOrDefault( category.getName(), 0 ) + quantity ;
-		
-		categoryTotal.put( category.getName(), newQuantity );
-		
-		categoryLimit.putIfAbsent(category.getName(), category.getQuantityPerOrder() );
-		
-	}
-	
 	public void generateOutputFile( ) {
-		
-		StringBuffer line = new StringBuffer();
 		
 		if( outputMessage.isEmpty() ) {
 			
-			for( Item currentItem : items ) {
-				
-				line.append( currentItem.getName() );
-				line.append( "," );
-				line.append( currentItem.getQuantityStock() );
-				line.append( "," );
-				line.append( currentItem.getPrice() );
-				line.append( "," );
-				line.append( currentItem.getPrice() * currentItem.getQuantityStock() );
-				
-				outputMessage.add(line.toString());
-				
-				line.setLength(0);
-				
-			}
+			outputMessage.add( "Amt Paid" );
 			
-			outputMessage.add( Double.toString(currentOrder.getTotalPrice() ) );
+			outputMessage.add( Double.toString( currentOrder.getTotalPrice() ) );
 			
 			try {
 				
-				orderFile.writeCheckoutFile( outputMessage );
+				file.writeCheckoutFile( outputMessage );
 				
 			} catch (IOException e) {
 				
@@ -255,7 +200,7 @@ public class OrderController {
 			
 			try {
 				
-				orderFile.writeMessage(outputMessage);
+				file.writeMessage( outputMessage );
 				
 			} catch (IOException e) {
 				
