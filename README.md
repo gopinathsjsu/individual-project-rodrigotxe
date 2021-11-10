@@ -1,6 +1,6 @@
 # MyMarket - Automated Purchasing System
 
-## How execute
+## How to run the system
 
 1 - The Stock input file ( Items dataset ) needd to be entered as the first Argument to the main class.
   - If the system cannot find the file, an error will be generated on the console.
