@@ -10,27 +10,36 @@ public class InMemoryDB {
 	
 	private static InMemoryDB instance;
 	
+	private HashMap<String, Integer> categoryCap = new HashMap<>();
+	
 	private HashMap<String, Item> items = new HashMap<>();
 	
 	private HashSet<String> cards = new HashSet<>();
 	
 	private ArrayList<Order> orders = new ArrayList<>();
 	
-	
-	private InMemoryDB( ) { }
+	private InMemoryDB( ) {
+		
+		categoryCap.put("Luxury", 3);
+		categoryCap.put("Essential", 5);
+		categoryCap.put("Misc", 6);
+		
+	}
 	
 	public static InMemoryDB getInstance( ) {
 		
-		if( instance == null ) {
+		if( instance == null ) 
 			
 			instance = new InMemoryDB();
 			
-		}
-		
 		return instance;
 		
 	}
 
+	public HashMap<String, Integer> getCategoryCap() {
+		return categoryCap;
+	}
+	
 	public HashMap<String, Item> getItems() {
 		return items;
 	}

@@ -2,6 +2,7 @@ package edu.sjsu.cmpe202.myMarket.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import edu.sjsu.cmpe202.myMarket.database.InMemoryDB;
@@ -21,6 +22,8 @@ public class OrderController {
 	private ArrayList<String> outputMessage = new ArrayList<>();
 	
 	private ArrayList<OrderItem> items = new ArrayList<>();
+	
+	private HashMap<String, Integer> quantityAccumulatedByCategory = new HashMap<>();
 	
 	private HashSet<String> creditCards = new HashSet<String>();
 	
@@ -52,8 +55,10 @@ public class OrderController {
 	
 	public boolean checkOrder( ) {
 		
+		checkCategoryCap();
+		
 		checkItemStock();
-	
+		
 		return outputMessage.isEmpty();
 		
 	}
@@ -119,8 +124,14 @@ public class OrderController {
 			String[] item = line.split(",");
 			
 			if ( db.getItems().containsKey(item[0]) ) {
+				
+				Item tempItem = db.getItems().get( item[0] );
+				
+				int quantity = Integer.parseInt( item[1] );
 
-				items.add( new OrderItem( item[0], Integer.parseInt( item[1] ), item[2].replaceAll("\\s+", "") ) );
+				items.add( new OrderItem( item[0], quantity, item[2].replaceAll("\\s+", "") ) );
+				
+				addQuantityToCategory( tempItem.getCategory(), quantity );
 
 			} else {
 				
@@ -138,7 +149,7 @@ public class OrderController {
 		
 	}
 	
-	private boolean checkItemStock( ) {
+	private void checkItemStock( ) {
 		
 		StringBuilder message = new StringBuilder();
 		
@@ -148,11 +159,9 @@ public class OrderController {
 			
 			if ( item.getQuantityStock() < currentItem.getQuantity() ) {
 				
-				if ( message.length() > 0 )
-
-					message.append( ", ");
+				if ( message.length() > 0 ) message.append( ", ");
 					
-				message.append( currentItem.getName() + "(" + item.getQuantityStock() + ")" );
+				message.append( currentItem.getName() + ": Quantity on stock (" + item.getQuantityStock() + ")" );
 					
 			} else {
 				
@@ -174,7 +183,47 @@ public class OrderController {
 			
 		}
 		
-		return message.length() == 0;
+	}
+	
+	private void addQuantityToCategory( String category, int desiredQuantity ) {
+		
+		int quantity = desiredQuantity;
+				
+		if ( quantityAccumulatedByCategory.containsKey( category ) )
+			
+			quantity += quantityAccumulatedByCategory.get( category );
+			
+		quantityAccumulatedByCategory.put( category, quantity );
+		
+	}
+	
+	private void checkCategoryCap(  ) { 
+		
+		StringBuilder message = new StringBuilder();
+		
+		db.getCategoryCap().forEach( ( category, quantityPermitted ) -> {
+			  
+			if ( quantityAccumulatedByCategory.containsKey( category ) ) { 
+				
+				if( quantityAccumulatedByCategory.get( category ) > quantityPermitted ) {
+					
+					if ( message.length() > 0 ) message.append( ", ");
+					
+					message.append( category + ": " + quantityPermitted );
+					
+				}
+				
+			}
+			
+		});
+		
+		if ( message.length() > 0 ) { 
+			
+			outputMessage.add("Maximum quantity allowed per category:");
+			
+			outputMessage.add( message.toString() );
+			
+		}
 		
 	}
 	

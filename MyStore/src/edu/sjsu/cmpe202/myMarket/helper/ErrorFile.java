@@ -12,9 +12,9 @@ public class ErrorFile implements OutputFile {
 	private ArrayList<String> content;
 	
 	@Override
-	public void writeToFile( ArrayList<String> errorMessage ) {
+	public void writeToFile( ArrayList<String> content ) {
 		
-		content = errorMessage;
+		this.content = content;
 		
 	}
 

@@ -19,15 +19,26 @@ public class MarketApplication {
 	
 	private void startMarket( String[] args ) {
 		
+		StringBuilder stringBuilder = new StringBuilder();
+		
 		if( args.length == 0 ) {
 			
 			System.out.println( "Please enter stock file to start" );
 			
 			System.exit(0);
 			
-		} 
+		}  
 		
-		StockController stockController = new StockController( args[0] );
+		// In case the user input a file with space in the name
+		for( String arg : args ) {
+			
+			if( !stringBuilder.isEmpty() ) stringBuilder.append(" ");
+			
+			stringBuilder.append(arg);
+			
+		}
+		
+		StockController stockController = new StockController( stringBuilder.toString() );
 		
 		stockController.createStock();
 		
@@ -77,13 +88,10 @@ public class MarketApplication {
 				
 				orderController.calculateTotalPrice();
 				
-				if( orderController.getTotalPrice() > 0 ) {
+				orderController.checkoutOrder();
 					
-					orderController.checkoutOrder();
-					
-					System.out.println( "The order was created with a total of $" + orderController.getTotalPrice() );
+				System.out.println( "The order was created with a total of $" + orderController.getTotalPrice() );
 				
-				}
 				
 			} else {
 				
