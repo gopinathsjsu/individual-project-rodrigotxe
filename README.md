@@ -33,7 +33,7 @@ Execution with file name as argument<br />
 ![screenshot 20](https://user-images.githubusercontent.com/62269628/144729694-ba7ff12d-0586-49c5-8b7f-d55e38de2878.jpg)
 
 First file: Input1 - Sheet1.csv<br />
-![screenshot 21](https://user-images.githubusercontent.com/62269628/144729704-897251a6-fc40-40c4-b266-69091e3cd248.jpg)
+![screenshot 24](https://user-images.githubusercontent.com/62269628/144729879-1f174813-082f-4a40-b7ef-3337db1be20a.jpg)
 
 First file output:<br />
 ![screenshot 28](https://user-images.githubusercontent.com/62269628/144729854-d6a270ca-6c5c-4953-a920-4f7442e1ab0c.jpg)
