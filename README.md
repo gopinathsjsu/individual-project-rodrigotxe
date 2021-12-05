@@ -20,8 +20,11 @@ All output files will be created in the same input files folder.
 
 ## Design Pattern
 
-- Singleton: Class InMemoryDB
-- Factory Method: Interface OutputFile, Class ErrorFile, Class CheckoutFile and Clas FileHandler
+- Singleton to handle one instance for the database: 
+Class InMemoryDB
+
+- Factory Method as there is multiples type of files that could be handle from different classes but with the same behaviour: 
+Interface OutputFile, Class ErrorFile, Class CheckoutFile and Class FileHandler
 
 ## Class Diagram
 
